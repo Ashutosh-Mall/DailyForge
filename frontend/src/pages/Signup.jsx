@@ -2,12 +2,14 @@ import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
 import { AuthContext } from "../context/AuthContext.jsx";
+import toast from "react-hot-toast";
 
 const Signup = () => {
   // three states for inputs
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   // useNavigate object
   const navigate = useNavigate();
@@ -22,6 +24,7 @@ const Signup = () => {
 
     // send request to server
     try {
+      setLoading(true);
       const res = await api.post("/auth/signup", {
         name,
         email,
@@ -36,13 +39,16 @@ const Signup = () => {
       // get user details
       const me = await api.get("/auth/me");
       setUser(me.data);
-
+      toast.success("Signup successful!");
       // redirect to dashboard
       navigate("/dashboard");
     } catch (error) {
       // handle error
       console.log("Signup failed");
       console.log(error.response?.data || error.message);
+      toast.error("Signup Failed");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -136,11 +142,11 @@ const Signup = () => {
         />
       </div>
 
-      <button
+      <button disabled={loading}
         type="submit"
         className="btn btn-primary cursor-pointer w-full mt-2 hover-lift"
       >
-        Sign Up
+        {loading ? "Creating..." : "Signup"}
       </button>
 
       <p className="text-center text-sm text-muted">

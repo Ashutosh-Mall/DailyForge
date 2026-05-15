@@ -7,11 +7,13 @@ import Dashboard from "./pages/Dashboard.jsx";
 import ProtectedRoutes from "./components/ProtectedRoutes.jsx";
 import Tasks from "./pages/Tasks.jsx";
 import RoutineBuilder from "./pages/RoutineBuilder.jsx";
+import { Toaster } from "react-hot-toast"
 
 const App = () => {
   return (
     <BrowserRouter>
       <Navbar />
+      <Toaster position="top-right" />
       <main className="app-bg min-h-screen pt-15 flex justify-center items-center">
         <Routes>
           <Route path="/" element={<Login />} />

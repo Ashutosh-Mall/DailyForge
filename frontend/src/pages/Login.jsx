@@ -2,11 +2,13 @@ import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
 import { AuthContext } from "../context/AuthContext.jsx";
+import toast from "react-hot-toast";
 
 const Login = () => {
   // two states for inputs
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   // useNavigate object
   const navigate = useNavigate();
@@ -21,6 +23,7 @@ const Login = () => {
 
     // send request to server
     try {
+      setLoading(true);
       const res = await api.post("/auth/login", {
         email,
         password,
@@ -34,13 +37,16 @@ const Login = () => {
       // get user details
       const me = await api.get("/auth/me");
       setUser(me.data);
-
+      toast.success("Login successful!");
       // redirect to dashboard
       navigate("/dashboard");
     } catch (error) {
       // handle error
       console.log("Login failed");
       console.log(error.response?.data || error.message);
+      toast.error("Login Failed");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -110,11 +116,11 @@ const Login = () => {
         />
       </div>
 
-      <button
+      <button disabled={loading}
         type="submit"
         className="btn btn-primary cursor-pointer w-full mt-2 hover-lift"
       >
-        Login
+        {loading ? "Processing..." : "Login"}
       </button>
 
       <p className="text-center text-sm text-muted">
