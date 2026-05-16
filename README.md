@@ -256,6 +256,8 @@ Copy the provided template to get started. **Never commit the .env to git.**
 PORT=5000
 MONGO_URI=your_mongodb_atlas_connection_string
 JWT_SECRET=your_super_secret_key_here
+EMAIL_USER=your_email@gmail.com
+EMAIL_PASS=your_gmail_app_password
 ```
 
 | Variable | Required | Description |
@@ -263,6 +265,8 @@ JWT_SECRET=your_super_secret_key_here
 | `PORT` | ✅ | Port on which the Express server runs (default: `5000`) |
 | `MONGO_URI` | ✅ | Full MongoDB Atlas connection string — get it from your Atlas cluster's "Connect" menu |
 | `JWT_SECRET` | ✅ | Secret key for signing JWTs — use any long, random string (e.g., `openssl rand -hex 32`) |
+| `EMAIL_USER` | ✅ | Gmail address used to send OTP verification emails |
+| `EMAIL_PASS` | ✅ | Gmail App Password used for Nodemailer authentication |
 
 **How to get `MONGO_URI`:**
 1. Log into [MongoDB Atlas](https://cloud.mongodb.com)
