@@ -248,6 +248,7 @@ Open `http://localhost:5173`, sign up for an account, and start building your ro
 
 ## 🔐 Environment Variables
 
+
 ### Backend — `backend/.env`
 
 Copy the provided template to get started. **Never commit the .env to git.**
@@ -258,6 +259,7 @@ MONGO_URI=your_mongodb_atlas_connection_string
 JWT_SECRET=your_super_secret_key_here
 EMAIL_USER=your_email@gmail.com
 EMAIL_PASS=your_gmail_app_password
+#CLIENT_ORIGIN=your_deployed_frontend_url
 ```
 
 | Variable | Required | Description |
@@ -267,6 +269,7 @@ EMAIL_PASS=your_gmail_app_password
 | `JWT_SECRET` | ✅ | Secret key for signing JWTs — use any long, random string (e.g., `openssl rand -hex 32`) |
 | `EMAIL_USER` | ✅ | Gmail address used to send OTP verification emails |
 | `EMAIL_PASS` | ✅ | Gmail App Password used for Nodemailer authentication |
+| `CLIENT_ORIGIN` | ⬜ | *(Optional)* Allowed CORS origin for API requests. Set this to your production frontend URL (e.g., `https://dailyforge-frontend-lhjq.onrender.com`). If not set, it defaults to `http://localhost:5173` for local development. |
 
 **How to get `MONGO_URI`:**
 1. Log into [MongoDB Atlas](https://cloud.mongodb.com)
