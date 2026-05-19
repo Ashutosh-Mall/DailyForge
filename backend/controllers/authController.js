@@ -17,16 +17,21 @@ export const signup = async (req, res) => {
       });
     }
 
-    // check permanent user
-    const existingUser = await User.findOne({email});
 
-    if (existingUser) {
-      return res.status(409).json({
-        message: "User already exists",
-      });
+    if (!name || name.trim().length < 2) {
+      return res.status(400).json({ message: "Name must be at least 2 characters long" });
     }
 
-    // remove previous temp user
+    const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
+    if (!password || !passwordRegex.test(password)) {
+      return res.status(400).json({ message: "Password must be at least 8 characters long, include an uppercase letter, a digit, and a special character" });
+    }
+
+    const checkExisting = await User.findOne({ email });
+    if (checkExisting) {
+      return res.status(409).json({ message: "User already exists" });
+    }
+
     await TempUserModel.findOneAndDelete({email});
 
     // hashing the password
@@ -54,6 +59,7 @@ export const signup = async (req, res) => {
     );
 
     return res.status(201).json({message: "OTP sent successfully"});
+
   } catch (error) {
     // error handling
     console.error("Signup error:", error);
@@ -106,17 +112,21 @@ export const verifyOTP = async (req, res) => {
       password: tempUser.password,
     });
 
-    const token = jwt.sign({id: user._id}, process.env.JWT_SECRET, {
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
       expiresIn: "24h",
     });
 
     await TempUserModel.deleteOne({email});
 
-    return res.status(201).json({
-      success: true,
-      message: "OTP verified successfully",
-      token,
-    });
+    return res
+      .status(201)
+      .cookie("token", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 24 * 60 * 60 * 1000,
+      })
+      .json({ message: "User registered successfully" });
 
   } catch (error) {
     console.error("Verify OTP Error:", error);
@@ -151,11 +161,19 @@ export const login = async (req, res) => {
       return res.status(401).json({message: "Password does not match"});
     }
 
-    // generate jwt token
-    const token = jwt.sign({id: user._id}, process.env.JWT_SECRET, {
-      expiresIn: process.env.JWT_EXPIRES_IN || "7d",
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "24h",
     });
-    return res.status(200).json({message: "Login successful", token});
+
+    return res
+      .status(200)
+      .cookie("token", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 24 * 60 * 60 * 1000,
+      })
+      .json({ message: "Login successful" });
   } catch (error) {
     // error handling
     console.log("Login error: ", error);
@@ -178,4 +196,14 @@ export const getUser = async (req, res) => {
       .status(500)
       .json({message: "Error fetching user data", success: false});
   }
+};
+
+// logout function
+export const logout = (req, res) => {
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+  });
+  return res.status(200).json({ message: "Logout successful" });
 };
