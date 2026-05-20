@@ -40,6 +40,8 @@ const Signup = () => {
 
     // send request to server
     try {
+      localStorage.removeItem("token");
+
       const res = await api.post("/auth/signup", {
         name,
         email,
